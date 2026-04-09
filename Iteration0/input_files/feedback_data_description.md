@@ -1,0 +1,1 @@
+The dataset description does not appear to explain the observed issues. The reported residual autocorrelation and non-normality in the VAR residuals are standard characteristics of macroeconomic time-series data rather than limitations directly attributable to the provided dataset constraints.
