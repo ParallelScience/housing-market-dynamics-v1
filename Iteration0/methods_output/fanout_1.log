@@ -1,0 +1,127 @@
+
+###### PROMPT BEGINS ########
+Human: You are provided with:
+- a description of the data
+- an idea
+- research plan to carry out the idea.
+
+Your task is to provide suggestions on how to improve the plan.
+Take into account and potential feedback (if any).
+If the plan is already good enough, do not give suggestions to improve it. If this is not first iteration, you will also be provided with the previous research plan along with some feedback on it. If this is the case, take into account the feedback provided when designing the new research plan. It is good to have a detailed plan, but not to have an overly complicated plan. If you dont have suggestions, just say that you dont have further suggestions. The idea should remain the same. No need to add code to the research plan, as another agent will write code given the research plan.
+
+Data description:
+# Data Description — U.S. Housing Market Dynamics (FRED)
+
+## Source
+Federal Reserve Economic Data (FRED), Federal Reserve Bank of St. Louis. All series are publicly available at https://fred.stlouisfed.org/.
+
+## Files
+
+### 1. `/home/node/work/projects/housing_v1/data/case_shiller.csv`
+- **Series:** `CSUSHPINSA` — S&P/Case-Shiller U.S. National Home Price Index
+- **Shape:** 470 rows × 2 columns (monthly, 1987-01 to ~2024)
+- **Column `observation_date`:** end-of-month date (YYYY-MM-DD)
+- **Column `CSUSHPINSA`:** composite price index, base = 2000-01-01 (index = 100). Seasonally adjusted. Unitless ratio scale.
+- **Note:** This is an index, not a dollar amount. A value of 200 means prices are twice the 2000 baseline.
+
+### 2. `/home/node/work/projects/housing_v1/data/housing_starts.csv`
+- **Series:** `HOUST` — Housing Starts: New Housing Units (Thousands, Monthly)
+- **Shape:** 806 rows × 2 columns (monthly, 1959-01 to ~2024)
+- **Column `observation_date`:** end-of-month date (YYYY-MM-DD)
+- **Column `HOUST`:** thousands of new privately-owned housing units started in that month. Seasonally adjusted annual rate (SAAR). Units: thousands of housing units.
+
+### 3. `/home/node/work/projects/housing_v1/data/mortgage_rates.csv`
+- **Series:** `MORTGAGE30US` — 30-Year Fixed Rate Mortgage Average (% APY, Weekly)
+- **Shape:** 2,872 rows × 2 columns (weekly, 1971-04-02 to ~2024)
+- **Column `observation_date`:** date of the week ending (YYYY-MM-DD)
+- **Column `MORTGAGE30US`:** average offered rate on 30-year fixed-rate mortgages. Units: percent per annum.
+
+## Temporal Overlap
+All three series overlap from 1987-01 to ~2024. Mortgage rates are weekly (Fridays); housing starts and Case-Shiller are monthly (end-of-month). For merged analysis, mortgage rates should be converted to monthly averages or end-of-month values.
+
+## Suggested Research Directions
+- Price-discovery dynamics: how do mortgage rate changes transmit to housing prices and construction activity?
+- Lead-lag relationships between starts, prices, and financing costs
+- Bubbles and busts: 2000s boom, 2008-2011 bust, COVID-era surge
+- Volatility dynamics and asymmetric responses (rates up vs. rates down)
+
+## Notes
+- All series are published by FRED with no missing values in the downloaded period.
+- The Case-Shiller index is revision-prone (late data points may shift slightly).
+- Mortgage rate data is weekly; interpolation to monthly may introduce minor aggregation artifacts.
+
+Idea:
+**Title: Structural Identification of Housing Market Shocks via Sign-Restricted VAR**
+
+This research employs a Structural Vector Autoregression (SVAR) model with sign restrictions to decompose volatility in the U.S. housing market into exogenous demand-side and supply-side shocks from 1987 to 2024. By imposing theoretical constraints on the impulse response functions—specifically identifying 'Demand Shocks' where `CSUSHPINSA` and `HOUST` move in the same direction, and 'Supply Shocks' where they move in opposition—the model isolates the latent drivers of price discovery. The framework treats the `MORTGAGE30US` (monthly averaged) as an exogenous policy shock variable, allowing for the quantification of how interest rate volatility filters through to price adjustments versus construction intent without the overfitting risks of regime-partitioning. This approach circumvents the need for external macroeconomic variables by relying on the internal co-movement dynamics of the FRED series to identify structural shifts. The resulting impulse responses characterize the duration and intensity of the market's response to financing costs, providing a robust measure of how demand-led cycles diverge from supply-constrained equilibria.
+
+Research plan:
+1. **Data Preprocessing and Harmonization**
+   - Standardize the temporal frequency of all datasets to a monthly format. For the weekly `MORTGAGE30US` series, calculate the monthly arithmetic mean to align with the end-of-month observations of `CSUSHPINSA` and `HOUST`.
+   - Trim all series to the common temporal window (1987-01 to 2024-01) to ensure a balanced panel.
+   - Apply a logarithmic transformation to the `CSUSHPINSA` and `HOUST` series to stabilize variance and interpret coefficients as elasticities.
+   - Compute the first differences of the log-transformed series to ensure stationarity, as required for VAR modeling.
+
+2. **Stationarity and Cointegration Testing**
+   - Conduct Augmented Dickey-Fuller (ADF) and Phillips-Perron (PP) tests on all transformed series to confirm the order of integration.
+   - Perform the Johansen cointegration test to determine if a Vector Error Correction Model (VECM) is required or if a VAR in differences is sufficient for the structural identification.
+
+3. **VAR Model Specification**
+   - Determine the optimal lag length ($p$) for the VAR model using information criteria (AIC, BIC, and HQIC).
+   - Estimate the reduced-form VAR model: $Y_t = c + \sum_{i=1}^p \Phi_i Y_{t-i} + \epsilon_t$, where $Y_t$ is the vector containing [$\Delta \log(\text{HOUST})$, $\Delta \log(\text{CSUSHPINSA})$, $\Delta(\text{MORTGAGE30US})$].
+   - Perform diagnostic checks on the residuals, including Portmanteau tests for autocorrelation and Jarque-Bera tests for multivariate normality.
+
+4. **Structural Identification via Sign Restrictions**
+   - Implement the identification strategy by imposing sign restrictions on the Impulse Response Functions (IRFs).
+   - Define 'Demand Shocks' as innovations where both housing starts and price index responses are positive.
+   - Define 'Supply Shocks' as innovations where housing starts and price index responses move in opposite directions (e.g., starts decrease while prices increase).
+   - Treat mortgage rate shocks as a policy-driven exogenous variable, restricting its response to be consistent with standard monetary transmission theory (e.g., an increase in rates leads to a decrease in starts and prices).
+
+5. **Estimation of Structural Shocks**
+   - Utilize the Rubio-Ramirez et al. (2010) algorithm to draw from the space of orthogonal matrices to satisfy the sign restrictions.
+   - Generate a distribution of structural models that satisfy the theoretical constraints, ensuring the identification is robust to the rotation of the impact matrix.
+
+6. **Impulse Response Function (IRF) Analysis**
+   - Compute the median IRFs and the 68% and 95% credible intervals for each structural shock.
+   - Analyze the persistence and magnitude of the housing market's response to a one-standard-deviation shock in mortgage rates.
+   - Quantify the relative contribution of demand versus supply shocks to the variance of housing prices over a 24-month horizon.
+
+7. **Historical Decomposition**
+   - Perform a historical decomposition of the `CSUSHPINSA` and `HOUST` series to attribute observed fluctuations to specific structural shocks (Demand, Supply, or Mortgage Rate).
+   - Map these decompositions to key historical periods, specifically the 2000s boom, the 2008-2011 bust, and the COVID-19 era, to validate the model's ability to capture known market dynamics.
+
+8. **Forecast Error Variance Decomposition (FEVD)**
+   - Calculate the FEVD to determine the proportion of the forecast error variance for each variable that is attributable to each of the identified structural shocks.
+   - Assess the degree to which mortgage rate volatility dominates the variance of housing prices versus construction activity, providing a measure of the sensitivity of the housing market to financing costs.
+
+Previous research plan:
+None
+
+Feedback on previous research plan:
+None
+
+
+Respond in this format:
+
+\\begin{SUGGESTIONS}
+<SUGGESTIONS>
+\\end{SUGGESTIONS}
+
+In <SUGGESTIONS> put the suggestions to improve the plan.
+
+###### PROMPT ENDS ########
+
+\begin{SUGGESTIONS}
+The research plan is well-structured and theoretically sound. To further strengthen the robustness and interpretability of the SVAR model, I suggest the following refinements:
+
+1. **Seasonality Handling:** While the FRED data for `CSUSHPINSA` and `HOUST` is seasonally adjusted, the `MORTGAGE30US` series is not. Even after monthly averaging, there may be residual seasonality in mortgage rates. Consider applying a seasonal adjustment (e.g., X-13ARIMA-SEATS or a simple seasonal decomposition) to the mortgage rate series before estimation to ensure that identified shocks are not capturing seasonal patterns.
+
+2. **Structural Identification Refinement:** In Step 4, ensure the sign restrictions are applied to the *impact* matrix (or a short horizon, e.g., 1-3 months) rather than the entire IRF path. Imposing restrictions over the entire horizon can be overly restrictive and may lead to a failure to find models that satisfy the criteria.
+
+3. **Ordering and Exogeneity:** In Step 3, you define the vector as [$\Delta \log(\text{HOUST})$, $\Delta \log(\text{CSUSHPINSA})$, $\Delta(\text{MORTGAGE30US})$]. Given that mortgage rates are often considered a "policy" or "external" variable, consider placing them first in the Cholesky ordering (if using a recursive identification as a baseline) or explicitly modeling them as an exogenous block in the VAR to prevent the endogenous variables from influencing the mortgage rate within the same period.
+
+4. **Data Stationarity:** You mention taking first differences of the log-transformed series. Ensure that you check for potential structural breaks in the mean of these series (e.g., the 2008 financial crisis or the post-COVID regime shift), as standard ADF tests may have low power in the presence of structural breaks. If breaks are detected, consider using dummy variables for these periods in the VAR specification.
+
+5. **Sensitivity Analysis:** Add a step to perform sensitivity analysis on the lag length and the horizon of the sign restrictions. This will demonstrate that your findings regarding the relative contribution of demand vs. supply shocks are not artifacts of specific parameter choices.
+\end{SUGGESTIONS}
+
