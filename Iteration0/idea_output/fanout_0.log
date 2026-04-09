@@ -1,0 +1,118 @@
+
+###### PROMPT BEGINS ########
+Human: 
+**Role**: Senior Scientific Lead and Peer Reviewer.
+**Objective**: Critically evaluate 10 proposed research ideas and select the single most impactful project to move into the planning phase.
+
+**Evaluation Framework**:
+To determine the "largest scientific impact," you must weigh each idea against the following four pillars:
+1. **Feasibility**: Given the constraints in the 'Data Description,' can this project actually be executed with the available variables?
+2. **Novelty**: Does the idea offer a fresh perspective, or is it a standard, derivative analysis?
+3. **Rigour**: Does the idea suggest a deep investigation into the underlying physics/logic of the data?
+4. **Utility**: Will the results provide actionable insights or significantly enhance our understanding of the system?
+5. The idea selected should be as different as possible to any previous ideas.
+
+**Task**:
+1. Review the proposed 10 research ideas along with any previous ideas.
+2. Review the 'Data Description' to ensure the ideas are physically and statistically grounded.
+3. Select the **one** idea that best balances innovation with scientific feasibility.
+4. The selected idea must contain a title and a description of it.
+
+**Operational Constraints**:
+- Do not provide a list of pros and cons.
+- Do not modify the original text of the idea.
+- Provide **only** the text of the selected idea within the required tags.
+
+Data description:
+# Data Description — U.S. Housing Market Dynamics (FRED)
+
+## Source
+Federal Reserve Economic Data (FRED), Federal Reserve Bank of St. Louis. All series are publicly available at https://fred.stlouisfed.org/.
+
+## Files
+
+### 1. `/home/node/work/projects/housing_v1/data/case_shiller.csv`
+- **Series:** `CSUSHPINSA` — S&P/Case-Shiller U.S. National Home Price Index
+- **Shape:** 470 rows × 2 columns (monthly, 1987-01 to ~2024)
+- **Column `observation_date`:** end-of-month date (YYYY-MM-DD)
+- **Column `CSUSHPINSA`:** composite price index, base = 2000-01-01 (index = 100). Seasonally adjusted. Unitless ratio scale.
+- **Note:** This is an index, not a dollar amount. A value of 200 means prices are twice the 2000 baseline.
+
+### 2. `/home/node/work/projects/housing_v1/data/housing_starts.csv`
+- **Series:** `HOUST` — Housing Starts: New Housing Units (Thousands, Monthly)
+- **Shape:** 806 rows × 2 columns (monthly, 1959-01 to ~2024)
+- **Column `observation_date`:** end-of-month date (YYYY-MM-DD)
+- **Column `HOUST`:** thousands of new privately-owned housing units started in that month. Seasonally adjusted annual rate (SAAR). Units: thousands of housing units.
+
+### 3. `/home/node/work/projects/housing_v1/data/mortgage_rates.csv`
+- **Series:** `MORTGAGE30US` — 30-Year Fixed Rate Mortgage Average (% APY, Weekly)
+- **Shape:** 2,872 rows × 2 columns (weekly, 1971-04-02 to ~2024)
+- **Column `observation_date`:** date of the week ending (YYYY-MM-DD)
+- **Column `MORTGAGE30US`:** average offered rate on 30-year fixed-rate mortgages. Units: percent per annum.
+
+## Temporal Overlap
+All three series overlap from 1987-01 to ~2024. Mortgage rates are weekly (Fridays); housing starts and Case-Shiller are monthly (end-of-month). For merged analysis, mortgage rates should be converted to monthly averages or end-of-month values.
+
+## Suggested Research Directions
+- Price-discovery dynamics: how do mortgage rate changes transmit to housing prices and construction activity?
+- Lead-lag relationships between starts, prices, and financing costs
+- Bubbles and busts: 2000s boom, 2008-2011 bust, COVID-era surge
+- Volatility dynamics and asymmetric responses (rates up vs. rates down)
+
+## Notes
+- All series are published by FRED with no missing values in the downloaded period.
+- The Case-Shiller index is revision-prone (late data points may shift slightly).
+- Mortgage rate data is weekly; interpolation to monthly may introduce minor aggregation artifacts.
+
+Proposed ideas:
+1. **Asymmetric Elasticity of Supply to Interest Rate Shocks**
+Does the housing supply (starts) respond with the same magnitude to falling interest rates as it does to rising rates? This research investigates whether the construction industry exhibits "ratchet effects," where supply contracts rapidly during tightening cycles but recovers sluggishly when rates decline.
+
+2. **The "Lock-In" Threshold and Price Inertia**
+At what specific mortgage rate delta does the housing market transition from a price-discovery phase to a liquidity-trap phase? This study seeks to define the critical interest rate threshold that effectively halts transaction volume and decouples Case-Shiller index movements from fundamental supply-demand equilibrium.
+
+3. **Temporal Lead-Lag Shifts Across Economic Regimes**
+How has the transmission latency between mortgage rate shifts and Case-Shiller price adjustments evolved from the 1990s to the post-COVID era? This project explores if the speed of information processing in the housing market has accelerated, effectively shortening the duration between financial shocks and tangible price impacts.
+
+4. **Volatility Clustering and Market Fragility**
+Can periods of extreme volatility in mortgage rates serve as a leading indicator for structural instability in the Case-Shiller index? This research aims to determine if heteroskedasticity in interest rates precedes regime shifts in home prices, potentially identifying precursors to housing bubbles.
+
+5. **Housing Starts as a Counter-Cyclical Buffer**
+To what extent do fluctuations in housing starts act as a dampening mechanism for price volatility during interest rate cycles? This study evaluates whether construction activity serves to stabilize the Case-Shiller index, or if it exacerbates price swings by creating supply overhangs during periods of high borrowing costs.
+
+6. **The Long-Term Decay of Mortgage Rate Sensitivity**
+Has the sensitivity of the U.S. housing market to 30-year fixed mortgage rates diminished over the last three decades? This research explores if structural changes in housing finance and demographic shifts have made the Case-Shiller index less responsive to traditional interest rate policy interventions.
+
+7. **Frequency-Domain Analysis of Housing Market Cycles**
+What are the dominant periodicities in the interplay between housing starts and home prices, and how are these cycles modulated by mortgage rate trends? This project decomposes the data to identify whether cyclical alignments are driven by macroeconomic business cycles or endogenous sector-specific feedback loops.
+
+8. **Non-Linear Impulse Response to Monetary Policy**
+Do abrupt versus gradual changes in mortgage rates yield fundamentally different trajectories for Case-Shiller home price indices? This research examines whether the housing market exhibits non-linear "shock" responses that deviate from the standard linear models used in traditional econometric forecasting.
+
+9. **The Lead Time of Supply-Side Anticipation**
+Do housing starts provide a reliable "early warning" signal for inflection points in the Case-Shiller index, independent of mortgage rate fluctuations? This study tests the hypothesis that construction activity reflects developer sentiment that precedes actual home price corrections by a quantifiable temporal lead.
+
+10. **The Equilibrium Gap: Measuring Historical Misalignment**
+Can we define a dynamic "fair value" for the Case-Shiller index by modeling the long-term cointegration between housing starts and mortgage rates? This research objective is to quantify the historical "gaps" between actual price indices and those predicted by fundamental supply and financing constraints to better identify periods of market irrationality.
+
+
+
+
+
+
+
+Respond in exactly the following format:
+
+\\begin{IDEA}
+<IDEA>
+\\end{IDEA}
+
+In <IDEA>, put the idea you have selected
+
+###### PROMPT ENDS ########
+
+\begin{IDEA}
+7. **Frequency-Domain Analysis of Housing Market Cycles**
+What are the dominant periodicities in the interplay between housing starts and home prices, and how are these cycles modulated by mortgage rate trends? This project decomposes the data to identify whether cyclical alignments are driven by macroeconomic business cycles or endogenous sector-specific feedback loops.
+\end{IDEA}
+
