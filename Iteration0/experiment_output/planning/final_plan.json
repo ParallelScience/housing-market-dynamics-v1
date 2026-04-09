@@ -1,0 +1,71 @@
+{
+    "sub_tasks": [
+        {
+            "bullet_points": [
+                "Load the three datasets from the provided paths.",
+                "Convert all series to a common monthly frequency (1987-01 to 2024-01).",
+                "Aggregate weekly mortgage rates to monthly arithmetic means.",
+                "Perform seasonal decomposition on all series to identify and remove residual seasonality.",
+                "Produce a multi-panel diagnostic plot showing raw and seasonally-adjusted time series for all three variables, saved as a PNG file.",
+                "Save the cleaned, harmonized dataset as a single file for subsequent analysis."
+            ],
+            "sub_task": "Data Preprocessing and Harmonization",
+            "sub_task_agent": "engineer"
+        },
+        {
+            "bullet_points": [
+                "Conduct Augmented Dickey-Fuller (ADF) and Phillips-Perron (PP) tests on the series to determine integration order.",
+                "Perform the Johansen cointegration test to check for long-run relationships.",
+                "Test for structural breaks using Zivot-Andrews tests.",
+                "Print all test statistics, critical values, and p-values to the console in a tabular format and save to a summary file.",
+                "Generate a plot of the Zivot-Andrews test statistic over time for each series, marking the identified break date and 5% critical value."
+            ],
+            "sub_task": "Stationarity and Structural Break Analysis",
+            "sub_task_agent": "engineer"
+        },
+        {
+            "bullet_points": [
+                "Define the VAR model using the log-transformed and differenced series.",
+                "Implement the block-exogenous structure for mortgage rates.",
+                "Determine optimal lag length using information criteria (AIC, BIC, HQIC) and print the results in a table.",
+                "Estimate the VAR model and perform diagnostic checks (Portmanteau, Jarque-Bera).",
+                "Print full diagnostic results to the console and save the estimated model parameters."
+            ],
+            "sub_task": "VAR Model Specification and Estimation",
+            "sub_task_agent": "engineer"
+        },
+        {
+            "bullet_points": [
+                "Apply sign restrictions to the impact matrix to identify Demand, Supply, and Policy shocks.",
+                "Use the Rubio-Ramirez et al. (2010) algorithm to draw at least 1000 accepted rotation matrices and print the acceptance rate.",
+                "Compute median Impulse Response Functions (IRFs) and 68%/95% credible intervals.",
+                "Generate a summary plot with separate panels for each shock and response variable, including shading for credible intervals and a zero reference line."
+            ],
+            "sub_task": "Structural Identification and Impulse Response Analysis",
+            "sub_task_agent": "engineer"
+        },
+        {
+            "bullet_points": [
+                "Perform historical decomposition to attribute fluctuations to specific shocks.",
+                "Calculate Forecast Error Variance Decomposition (FEVD) at horizons 1, 6, 12, 24, and 36 months.",
+                "Print the FEVD table with percentage contributions for each shock.",
+                "Generate a historical decomposition plot displaying shock contributions as stacked/overlaid charts, annotated with key historical episodes (2000s boom, 2008 bust, COVID-19)."
+            ],
+            "sub_task": "Historical Decomposition and Variance Decomposition",
+            "sub_task_agent": "engineer"
+        },
+        {
+            "bullet_points": [
+                "Write a complete, self-contained Results section including:",
+                "(a) Data preprocessing and stationarity findings with cited test statistics.",
+                "(b) VAR specification and diagnostic results.",
+                "(c) Structural identification and IRF analysis with quantitative discussion of peak responses and persistence.",
+                "(d) Historical decomposition tied to named historical episodes.",
+                "(e) FEVD analysis with numerical citations from the printed tables.",
+                "Ensure all generated plots are referenced by description and provide a concluding assessment of model robustness and market dynamics."
+            ],
+            "sub_task": "Results Synthesis and Reporting",
+            "sub_task_agent": "researcher"
+        }
+    ]
+}

@@ -1,0 +1,21 @@
+ADF CSUSHPINSA (Level): Stat=1.9762, p-value=0.9986
+ADF CSUSHPINSA (Diff): Stat=-2.9579, p-value=0.039
+ADF HOUST (Level): Stat=-2.2735, p-value=0.1806
+ADF HOUST (Diff): Stat=-3.1935, p-value=0.0204
+ADF MORTGAGE30US (Level): Stat=-1.8241, p-value=0.3686
+ADF MORTGAGE30US (Diff): Stat=-5.7729, p-value=0.0
+PP CSUSHPINSA (Level): Stat=2.1455, p-value=0.9988
+PP CSUSHPINSA (Diff): Stat=-3.239, p-value=0.0178
+PP HOUST (Level): Stat=-2.4809, p-value=0.1202
+PP HOUST (Diff): Stat=-30.9593, p-value=0.0
+PP MORTGAGE30US (Level): Stat=-1.6281, p-value=0.4685
+PP MORTGAGE30US (Diff): Stat=-14.1392, p-value=0.0
+Johansen Trace r<=0: Stat=26.4184, 95% CV=29.7961
+Johansen Trace r<=1: Stat=7.4591, 95% CV=15.4943
+Johansen Trace r<=2: Stat=0.0909, 95% CV=3.8415
+Johansen MaxEig r<=0: Stat=18.9592, 95% CV=21.1314
+Johansen MaxEig r<=1: Stat=7.3683, 95% CV=14.2639
+Johansen MaxEig r<=2: Stat=0.0909, 95% CV=3.8415
+ZA CSUSHPINSA: Stat=-1.0435, p-value=0.999, Break Date=2018-03-01
+ZA HOUST: Stat=-5.7781, p-value=0.0014, Break Date=2006-02-01
+ZA MORTGAGE30US: Stat=-1.9616, p-value=0.9977, Break Date=2017-11-01
