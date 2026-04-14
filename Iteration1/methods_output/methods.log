@@ -131,43 +131,41 @@ In <METHODS> put the methods you have generated.
 
 \begin{METHODS}
 1. **Data Augmentation and Refinement**
-   - Incorporate the 'Inventory of Unsold Homes' (e.g., `HOSINVUSM495N` from FRED) to address the residual autocorrelation identified in previous iterations.
-   - Calculate the spread between the `MORTGAGE30US` and the 10-year Treasury constant maturity rate (e.g., `DGS10`) to distinguish between general interest rate movements and credit-market friction shocks.
-   - Re-standardize all series to monthly frequency, applying log-transformations to non-stationary variables (Prices, Starts, Inventory) to stabilize variance.
+   - Incorporate the 'New Privately-Owned Housing Units Completed' (COMPUTSA) or 'Monthly Supply of Houses in the United States' (MSACSR) from FRED to serve as a proxy for inventory/supply constraints, addressing the residual autocorrelation identified in previous iterations.
+   - Calculate the spread between `MORTGAGE30US` and the 10-year Treasury constant maturity rate (DGS10) to isolate credit-market friction shocks from pure monetary policy shifts.
+   - Re-standardize all series to monthly frequency, applying log-transformations to price and volume indices to stabilize variance.
 
-2. **Model Specification with Volatility Modeling**
-   - Specify a Structural Vector Autoregression (SVAR) model including: [$\Delta \text{Spread}$, $\Delta \log(\text{HOUST})$, $\Delta \log(\text{CSUSHPINSA})$, $\Delta \log(\text{Inventory})$].
-   - Implement a GARCH-in-mean process within the VAR framework to account for volatility clustering, ensuring that credible intervals for impulse responses are robust to heteroskedasticity.
-   - Re-evaluate lag length ($p$) using information criteria (AIC/BIC) while ensuring the Portmanteau test for residual autocorrelation is satisfied.
+2. **Refined Model Specification**
+   - Re-estimate the VAR model including the new inventory proxy and the mortgage-Treasury spread.
+   - Address residual autocorrelation by testing a VAR-GARCH-in-mean specification to account for volatility clustering, ensuring that credible intervals for impulse responses are robust to heteroskedasticity.
+   - Re-evaluate lag length ($p$) using the Hannan-Quinn Information Criterion (HQIC) to balance model parsimony with the need to capture complex dynamic interactions.
 
-3. **Structural Identification via Sign Restrictions**
-   - Maintain the sign-restricted identification scheme:
-     - **Demand Shock:** Positive co-movement of $\Delta \log(\text{HOUST})$ and $\Delta \log(\text{CSUSHPINSA})$.
-     - **Supply Shock:** Opposite movement of $\Delta \log(\text{HOUST})$ and $\Delta \log(\text{CSUSHPINSA})$.
-     - **Financing Cost Shock:** Increase in mortgage spread leads to a decrease in both $\Delta \log(\text{HOUST})$ and $\Delta \log(\text{CSUSHPINSA})$.
-   - Apply these restrictions on the impact matrix (1-month horizon) using the Rubio-Ramirez et al. (2010) algorithm to sample from the space of valid structural matrices.
+3. **Structural Identification with Augmented Sign Restrictions**
+   - Maintain the baseline sign restrictions for Demand (positive co-movement of prices and starts) and Supply (negative co-movement).
+   - Refine the 'Financing Cost Shock' identification: define it as a positive shock to the mortgage-Treasury spread that leads to a decline in both housing starts and prices, distinguishing it from broader macroeconomic policy shocks.
+   - Implement the Rubio-Ramirez et al. (2010) algorithm to draw from the space of orthogonal matrices, ensuring the identification is consistent with the augmented variable set.
 
 4. **Sub-sample Comparative Analysis**
    - Split the dataset into two distinct regimes: Pre-2008 (1987–2007) and Post-2012 (2012–2024).
-   - Estimate the SVAR separately for these periods to compare the persistence of "Supply Shocks" on price indices.
-   - Conduct a formal test for parameter stability across these regimes to quantify the shift in structural supply constraints.
+   - Estimate the SVAR separately for these periods to compare the persistence of 'Supply Shocks' on price indices.
+   - Conduct a formal Chow-type test on the structural parameters to statistically validate the hypothesis that supply-side constraints have become more persistent in the post-2012 era.
 
 5. **Counterfactual Simulation (COVID-19 Era)**
-   - Utilize the estimated SVAR parameters to perform a counterfactual simulation for the period 2020-2022.
-   - Fix the 'Financing Cost' variable at its 2019 average level while allowing 'Demand' and 'Supply' shocks to follow their historical realizations.
-   - Compare the simulated path of the Case-Shiller index against the actual observed index to isolate the specific contribution of financing costs to the COVID-era price surge.
+   - Utilize the estimated SVAR coefficients to perform a counterfactual simulation for the period 2020-2022.
+   - Fix the 'Financing Cost' variable at its 2019 average level while allowing the model to generate endogenous responses for `CSUSHPINSA` and `HOUST` based on the identified structural shocks.
+   - Compare the simulated path of the Case-Shiller index against the observed historical data to isolate the specific contribution of interest rate volatility to the COVID-era price surge.
 
 6. **Robustness and Sensitivity Testing**
-   - Perform sensitivity analysis on the sign restriction horizon (testing 1-month vs. 3-month impact constraints) to ensure the identification is not overly sensitive to the timing of market responses.
-   - Verify that the inclusion of the inventory variable and the GARCH process has successfully eliminated residual autocorrelation via updated diagnostic testing.
+   - Perform a sensitivity analysis on the sign restriction horizon (e.g., testing 1-month vs. 3-month impact constraints) to ensure the identified shocks are not sensitive to the timing of the initial response.
+   - Verify the stability of the impulse response functions by bootstrapping the residuals (1,000 iterations) to generate robust confidence bands.
 
-7. **Variance Decomposition and Interpretation**
-   - Re-calculate the Forecast Error Variance Decomposition (FEVD) for the housing price index.
-   - Reframe the interpretation of results to explicitly state that the findings represent the relative importance of financing costs *within the internal dynamics of the housing market*, acknowledging the model's closed-system nature.
+7. **Re-evaluation of Variance Decomposition**
+   - Re-calculate the Forecast Error Variance Decomposition (FEVD) using the augmented model.
+   - Explicitly frame the results as the "relative importance of financing costs within the internal dynamics of the housing market," acknowledging the model's closed-system nature and the exclusion of broader macroeconomic variables like GDP or CPI.
 
 8. **Synthesis of Findings**
-   - Aggregate the impulse response functions (IRFs) and historical decomposition results to construct a narrative on the evolution of housing market drivers.
-   - Document the divergence between demand-led cycles and supply-constrained equilibria, specifically highlighting how the persistence of supply shocks has changed in the post-2012 era.
+   - Aggregate the results from the historical decomposition, sub-sample analysis, and counterfactual simulations to construct a narrative on the evolution of housing market drivers.
+   - Document the shift in the intensity of supply-side constraints and the specific role of financing costs in the post-2012 market equilibrium.
 \end{METHODS}
 
 
@@ -226,59 +224,57 @@ This research employs a Structural Vector Autoregression (SVAR) model with sign 
 
 Current research plan:
 1. **Data Augmentation and Refinement**
-   - Incorporate the 'Inventory of Unsold Homes' (e.g., `HOSINVUSM495N` from FRED) to address the residual autocorrelation identified in previous iterations.
-   - Calculate the spread between the `MORTGAGE30US` and the 10-year Treasury constant maturity rate (e.g., `DGS10`) to distinguish between general interest rate movements and credit-market friction shocks.
-   - Re-standardize all series to monthly frequency, applying log-transformations to non-stationary variables (Prices, Starts, Inventory) to stabilize variance.
+   - Incorporate the 'New Privately-Owned Housing Units Completed' (COMPUTSA) or 'Monthly Supply of Houses in the United States' (MSACSR) from FRED to serve as a proxy for inventory/supply constraints, addressing the residual autocorrelation identified in previous iterations.
+   - Calculate the spread between `MORTGAGE30US` and the 10-year Treasury constant maturity rate (DGS10) to isolate credit-market friction shocks from pure monetary policy shifts.
+   - Re-standardize all series to monthly frequency, applying log-transformations to price and volume indices to stabilize variance.
 
-2. **Model Specification with Volatility Modeling**
-   - Specify a Structural Vector Autoregression (SVAR) model including: [$\Delta \text{Spread}$, $\Delta \log(\text{HOUST})$, $\Delta \log(\text{CSUSHPINSA})$, $\Delta \log(\text{Inventory})$].
-   - Implement a GARCH-in-mean process within the VAR framework to account for volatility clustering, ensuring that credible intervals for impulse responses are robust to heteroskedasticity.
-   - Re-evaluate lag length ($p$) using information criteria (AIC/BIC) while ensuring the Portmanteau test for residual autocorrelation is satisfied.
+2. **Refined Model Specification**
+   - Re-estimate the VAR model including the new inventory proxy and the mortgage-Treasury spread.
+   - Address residual autocorrelation by testing a VAR-GARCH-in-mean specification to account for volatility clustering, ensuring that credible intervals for impulse responses are robust to heteroskedasticity.
+   - Re-evaluate lag length ($p$) using the Hannan-Quinn Information Criterion (HQIC) to balance model parsimony with the need to capture complex dynamic interactions.
 
-3. **Structural Identification via Sign Restrictions**
-   - Maintain the sign-restricted identification scheme:
-     - **Demand Shock:** Positive co-movement of $\Delta \log(\text{HOUST})$ and $\Delta \log(\text{CSUSHPINSA})$.
-     - **Supply Shock:** Opposite movement of $\Delta \log(\text{HOUST})$ and $\Delta \log(\text{CSUSHPINSA})$.
-     - **Financing Cost Shock:** Increase in mortgage spread leads to a decrease in both $\Delta \log(\text{HOUST})$ and $\Delta \log(\text{CSUSHPINSA})$.
-   - Apply these restrictions on the impact matrix (1-month horizon) using the Rubio-Ramirez et al. (2010) algorithm to sample from the space of valid structural matrices.
+3. **Structural Identification with Augmented Sign Restrictions**
+   - Maintain the baseline sign restrictions for Demand (positive co-movement of prices and starts) and Supply (negative co-movement).
+   - Refine the 'Financing Cost Shock' identification: define it as a positive shock to the mortgage-Treasury spread that leads to a decline in both housing starts and prices, distinguishing it from broader macroeconomic policy shocks.
+   - Implement the Rubio-Ramirez et al. (2010) algorithm to draw from the space of orthogonal matrices, ensuring the identification is consistent with the augmented variable set.
 
 4. **Sub-sample Comparative Analysis**
    - Split the dataset into two distinct regimes: Pre-2008 (1987–2007) and Post-2012 (2012–2024).
-   - Estimate the SVAR separately for these periods to compare the persistence of "Supply Shocks" on price indices.
-   - Conduct a formal test for parameter stability across these regimes to quantify the shift in structural supply constraints.
+   - Estimate the SVAR separately for these periods to compare the persistence of 'Supply Shocks' on price indices.
+   - Conduct a formal Chow-type test on the structural parameters to statistically validate the hypothesis that supply-side constraints have become more persistent in the post-2012 era.
 
 5. **Counterfactual Simulation (COVID-19 Era)**
-   - Utilize the estimated SVAR parameters to perform a counterfactual simulation for the period 2020-2022.
-   - Fix the 'Financing Cost' variable at its 2019 average level while allowing 'Demand' and 'Supply' shocks to follow their historical realizations.
-   - Compare the simulated path of the Case-Shiller index against the actual observed index to isolate the specific contribution of financing costs to the COVID-era price surge.
+   - Utilize the estimated SVAR coefficients to perform a counterfactual simulation for the period 2020-2022.
+   - Fix the 'Financing Cost' variable at its 2019 average level while allowing the model to generate endogenous responses for `CSUSHPINSA` and `HOUST` based on the identified structural shocks.
+   - Compare the simulated path of the Case-Shiller index against the observed historical data to isolate the specific contribution of interest rate volatility to the COVID-era price surge.
 
 6. **Robustness and Sensitivity Testing**
-   - Perform sensitivity analysis on the sign restriction horizon (testing 1-month vs. 3-month impact constraints) to ensure the identification is not overly sensitive to the timing of market responses.
-   - Verify that the inclusion of the inventory variable and the GARCH process has successfully eliminated residual autocorrelation via updated diagnostic testing.
+   - Perform a sensitivity analysis on the sign restriction horizon (e.g., testing 1-month vs. 3-month impact constraints) to ensure the identified shocks are not sensitive to the timing of the initial response.
+   - Verify the stability of the impulse response functions by bootstrapping the residuals (1,000 iterations) to generate robust confidence bands.
 
-7. **Variance Decomposition and Interpretation**
-   - Re-calculate the Forecast Error Variance Decomposition (FEVD) for the housing price index.
-   - Reframe the interpretation of results to explicitly state that the findings represent the relative importance of financing costs *within the internal dynamics of the housing market*, acknowledging the model's closed-system nature.
+7. **Re-evaluation of Variance Decomposition**
+   - Re-calculate the Forecast Error Variance Decomposition (FEVD) using the augmented model.
+   - Explicitly frame the results as the "relative importance of financing costs within the internal dynamics of the housing market," acknowledging the model's closed-system nature and the exclusion of broader macroeconomic variables like GDP or CPI.
 
 8. **Synthesis of Findings**
-   - Aggregate the impulse response functions (IRFs) and historical decomposition results to construct a narrative on the evolution of housing market drivers.
-   - Document the divergence between demand-led cycles and supply-constrained equilibria, specifically highlighting how the persistence of supply shocks has changed in the post-2012 era.
+   - Aggregate the results from the historical decomposition, sub-sample analysis, and counterfactual simulations to construct a narrative on the evolution of housing market drivers.
+   - Document the shift in the intensity of supply-side constraints and the specific role of financing costs in the post-2012 market equilibrium.
 
 Suggestions:
 
 
         Suggestion #1:
-        content='The updated research plan is highly robust and effectively incorporates the previous feedback. I have only a few minor suggestions to further strengthen the execution:\n\n1. **Refine the "Financing Cost Shock" Identification:** In Step 3, you define a Financing Cost Shock as an increase in the spread leading to a decrease in both starts and prices. Ensure that the sign restriction for this shock is *strictly* applied to the spread variable (positive) and the housing variables (negative). To avoid conflating this with a general demand shock, consider adding a "zero restriction" or a specific ordering in the impact matrix if the Rubio-Ramirez algorithm allows, ensuring that the financing shock is the only one permitted to move the spread significantly on impact.\n\n2. **Inventory Data Alignment:** Since `HOSINVUSM495N` (Inventory of Unsold Homes) is a monthly series, ensure that you handle the potential mismatch in publication timing. Inventory data is often released with a lag compared to price indices. Ensure the data cleaning step explicitly accounts for this alignment so that the VAR does not inadvertently use "future" information for the current month\'s estimation.\n\n3. **GARCH-in-Mean Specification:** In Step 2, you mention a GARCH-in-mean process. Be aware that estimating a multivariate GARCH-in-mean within a sign-restricted SVAR is computationally intensive and can lead to convergence issues. I suggest starting with a simpler **Stochastic Volatility (SV)** model or a **Constant Conditional Correlation (CCC)-GARCH** if the full GARCH-in-mean fails to converge. This will still achieve the goal of accounting for heteroskedasticity without over-complicating the estimation.\n\n4. **Counterfactual Sensitivity:** In Step 5, when performing the counterfactual for the COVID-19 era, consider running two scenarios: one where you hold the *spread* constant at 2019 levels, and one where you hold the *nominal mortgage rate* constant. This will help distinguish whether the price surge was driven by the absolute cost of borrowing or the specific widening of credit-market frictions (the spread) during the pandemic.\n\nThe plan is otherwise excellent and well-structured.' additional_kwargs={} response_metadata={} id='28a345a3-f68f-477f-9d3d-72a1adfe00b4'
+        content='The updated research plan is comprehensive and effectively addresses the previous feedback. To further refine the plan and ensure the model remains tractable, consider the following minor adjustments:\n\n1. **Refine the Inventory Proxy:** In Step 1, you mention using \'Monthly Supply of Houses\' (MSACSR). Note that this series is a ratio (months\' supply) rather than a raw inventory count. Ensure that you use the raw inventory series (e.g., `HOSSUPUSM673N`) or explicitly account for the fact that MSACSR is endogenous to both sales and inventory. Using the raw inventory count is generally preferred for structural identification to avoid circularity in the supply-side shock definition.\n\n2. **Clarify the VAR-GARCH Implementation:** In Step 2, you propose a "VAR-GARCH-in-mean" specification. Be aware that estimating a full multivariate GARCH model with sign restrictions can be computationally intensive and prone to convergence issues. Ensure the plan includes a fallback to a simpler "VAR with robust standard errors" (e.g., Newey-West) if the GARCH-in-mean model fails to converge, as the primary goal is to address the autocorrelation and heteroskedasticity identified in the previous iteration.\n\n3. **Refine the Counterfactual (Step 5):** When performing the counterfactual simulation for 2020-2022, ensure you account for the "Lucas Critique" implicitly by acknowledging that the structural parameters (the way agents respond to rates) might have shifted during the pandemic. While you cannot fully solve this in a standard SVAR, adding a brief note in your methodology about the "conditional nature" of the counterfactual will strengthen the academic rigor of your findings.\n\n4. **Consistency in Data Transformation:** Ensure that the log-transformations mentioned in Step 1 are applied consistently across all price and volume indices before calculating the mortgage-Treasury spread. Since the spread is already a percentage point difference, it should remain in levels (or first differences, depending on stationarity tests) rather than logs, to maintain interpretability.\n\nThe plan is otherwise well-structured and ready for implementation.' additional_kwargs={} response_metadata={} id='e94759c8-2adb-4237-8e67-335a2df52350'
 
 
 
         Suggestion #2:
-        content='The updated research plan is highly robust and effectively incorporates the previous feedback. I have only two minor suggestions to further strengthen the execution:\n\n1. **Refine the "Financing Cost Shock" Identification:** In Step 3, you define a Financing Cost Shock as an increase in the spread leading to a decrease in both starts and prices. Ensure that the sign restrictions for this shock are strictly enforced as *contemporaneous* (impact) restrictions. Given that mortgage rates are often "fast" variables, consider whether you need to allow for a delayed response in the housing variables (e.g., zero-restriction on the impact of the spread on starts/prices) to prevent the model from forcing an immediate, unrealistic reaction in physical construction activity.\n\n2. **Inventory Data Alignment:** Since `HOSINVUSM495N` (Inventory of Unsold Homes) is a monthly series, ensure that the data cleaning step explicitly handles the potential mismatch in reporting dates (e.g., end-of-month vs. mid-month) to avoid look-ahead bias when merging with the Case-Shiller index.\n\n3. **GARCH-in-mean Implementation:** Ensure the GARCH-in-mean specification is applied to the *residuals* of the VAR equations. Since GARCH-in-mean models can be computationally intensive and prone to convergence issues in high-dimensional VARs, include a fallback plan to use a standard VAR with Newey-West robust standard errors if the GARCH-in-mean process fails to converge or produces unstable impulse responses.\n\nThe plan is otherwise excellent and ready for implementation.' additional_kwargs={} response_metadata={} id='e705b873-e91a-4a61-9b87-7dd3a2078186'
+        content='The updated research plan is comprehensive and effectively incorporates the previous feedback. To further strengthen the proposal, consider the following refinements:\n\n1. **Clarification of the "Inventory" Variable:** In Step 1, you mention using \'Monthly Supply of Houses\' (MSACSR). Note that this series is a ratio (months\' supply) rather than a raw inventory count. Ensure your data processing step explicitly accounts for this by either using the raw \'New Houses for Sale\' (HNFSEPUS) or by log-transforming the ratio to maintain consistency with the other log-transformed variables.\n\n2. **Refining the Counterfactual (Step 5):** The counterfactual simulation is a strong addition. To make it more robust, ensure you account for the *Lucas Critique* implicitly by acknowledging that the structural parameters (the behavioral responses of builders and buyers) are assumed constant. It would be beneficial to perform a "sensitivity check" on the counterfactual by running it using the parameters from both the pre-2008 and post-2012 regimes to see if the "Financing Cost" impact on the COVID surge varies based on the structural regime.\n\n3. **Addressing the "Financing Cost" vs. "Policy" distinction:** While you have introduced the mortgage-Treasury spread to isolate credit-market frictions, ensure that your interpretation in Step 8 clearly distinguishes between *spread-driven* shocks (credit risk/liquidity) and *level-driven* shocks (interest rate environment). This distinction is crucial for the narrative regarding the post-2012 era.\n\n4. **Model Parsimony:** You have added several components (GARCH-in-mean, inventory proxy, spread variable). Be mindful that adding too many variables to a VAR with a limited sample size (1987-2024) can lead to the "curse of dimensionality." Ensure that the lag length selection (HQIC) is strictly enforced to prevent overfitting, and consider a Bayesian VAR (BVAR) approach with Minnesota priors if the standard VAR shows signs of instability or excessive parameter noise.\n\nThe plan is otherwise well-structured and addresses the previous feedback points thoroughly.' additional_kwargs={} response_metadata={} id='170ec1e2-71e1-4bb6-893e-35325e5f4c69'
 
 
 
         Suggestion #3:
-        content='The updated research plan is highly robust and effectively incorporates the previous feedback. I have only two minor suggestions to further refine the execution:\n\n1. **Refine the "Financing Cost Shock" Identification:** In Step 3, you define a "Financing Cost Shock" as an increase in the spread leading to a decrease in both starts and prices. While this is directionally correct, ensure that the sign restriction for this shock is *strictly* applied to the spread variable (i.e., the spread must increase) to distinguish it from a general demand shock. You may also want to consider adding a "neutral" restriction on the Inventory variable for the Financing Cost shock if the model struggles with identification, as financing costs affect the *desire* to build (starts) and the *ability* to buy (prices) more directly than they affect the existing stock of inventory.\n\n2. **Clarify the Counterfactual Baseline:** In Step 5, ensure the counterfactual simulation accounts for the *feedback loops* inherent in the VAR. When you fix the \'Financing Cost\' variable at the 2019 average, the model should allow the endogenous variables (Starts, Prices, Inventory) to evolve according to the estimated structural coefficients. Explicitly state that you are setting the *innovation* (shock) to the Financing Cost variable to zero (or the difference between the actual and 2019 average) while allowing the endogenous dynamics to propagate.\n\nThe plan is otherwise excellent and well-structured.' additional_kwargs={} response_metadata={} id='8cd30a16-6de2-48e0-a98b-7b0aedcac0cb'
+        content='The updated research plan is comprehensive and effectively incorporates the previous feedback. To further strengthen the proposal, consider the following refinements:\n\n1. **Refine the \'Financing Cost Shock\' Identification:** In Step 3, ensure that the sign restrictions for the \'Financing Cost Shock\' are carefully calibrated. While a positive shock to the mortgage-Treasury spread is a good proxy for credit friction, ensure that the model does not inadvertently restrict the *magnitude* of the response. Consider using "zero-impact" restrictions on the contemporaneous response of housing starts to the mortgage spread if you want to isolate the "information" effect of the spread from the "liquidity" effect.\n\n2. **Clarify the Counterfactual Methodology:** In Step 5, ensure the counterfactual simulation accounts for the *feedback loops* inherent in the VAR. Since the model is a system, fixing the mortgage rate variable requires "shutting off" the endogenous response of the mortgage rate to other variables (like price shocks) for that specific period. Explicitly state that you will treat the mortgage rate as an exogenous input during the simulation to avoid circularity.\n\n3. **Address Potential Data Mismatch:** You are adding `COMPUTSA` (Completions) or `MSACSR` (Supply). Note that `MSACSR` is a ratio (months\' supply), while `HOUST` is a level. Ensure that these are transformed consistently (e.g., log-levels or growth rates) so that the VAR coefficients are interpretable. If using `MSACSR`, be aware that it is highly sensitive to the denominator (sales), which might introduce unwanted volatility; `COMPUTSA` is generally a more stable proxy for physical supply.\n\n4. **Refine the Sub-sample Analysis:** In Step 4, ensure the sub-sample analysis is robust to the "curse of dimensionality." Adding variables (inventory, spreads) increases the number of parameters to estimate. With a smaller sub-sample (e.g., 1987-2007), ensure the degrees of freedom are sufficient to maintain stable impulse responses. If the model becomes unstable, consider using a Bayesian VAR (BVAR) with Minnesota priors to shrink the parameter space, which is standard practice for smaller sub-samples.\n\n5. **Documentation of "Closed-System" Limitations:** In Step 7, ensure the discussion explicitly addresses the "omitted variable bias" inherent in a closed-system model. Acknowledge that the identified "Supply Shocks" might partially reflect unobserved demand-side factors (like shifts in household formation or migration) that are not captured by the limited variable set.' additional_kwargs={} response_metadata={} id='b9de499c-df44-4936-a61b-260258b51595'
 
 
 
@@ -293,44 +289,44 @@ In <METHODS> put the new research methodology. Reply with the new research metho
 ###### PROMPT ENDS ########
 
 \begin{METHODS}
-1. **Data Preparation and Alignment**
-   - Aggregate weekly `MORTGAGE30US` and `DGS10` into monthly averages. Calculate the spread (MORTGAGE30US - DGS10).
-   - Merge all series (CSUSHPINSA, HOUST, Inventory, Spread) into a single monthly dataframe.
-   - Explicitly handle publication lags: align the Inventory series to ensure that the data used for a given month is only that which would have been available at the time, preventing look-ahead bias.
-   - Apply log-transformations to non-stationary variables (Prices, Starts, Inventory) and compute first differences for all variables to ensure stationarity.
+1. **Data Preparation and Harmonization**
+   - Aggregate `MORTGAGE30US` to monthly frequency using end-of-month values.
+   - Construct the credit-market friction proxy: the spread between `MORTGAGE30US` and the 10-year Treasury constant maturity rate (DGS10).
+   - Select `COMPUTSA` (New Privately-Owned Housing Units Completed) as the primary inventory/supply proxy to avoid the endogeneity issues inherent in the `MSACSR` ratio.
+   - Apply log-transformations to `CSUSHPINSA`, `HOUST`, and `COMPUTSA` to stabilize variance; keep the mortgage-Treasury spread in levels (percentage points) to maintain interpretability.
 
-2. **Model Specification and Volatility Handling**
-   - Specify a Structural Vector Autoregression (SVAR) model: [$\Delta \text{Spread}$, $\Delta \log(\text{HOUST})$, $\Delta \log(\text{CSUSHPINSA})$, $\Delta \log(\text{Inventory})$].
-   - Select lag length ($p$) using AIC/BIC criteria, ensuring the Portmanteau test confirms no residual autocorrelation.
-   - Implement a Constant Conditional Correlation (CCC)-GARCH model to account for heteroskedasticity. If convergence issues arise, fall back to a standard VAR with Newey-West robust standard errors.
+2. **Model Specification and Estimation**
+   - Estimate a Structural Vector Autoregression (SVAR) model. Given the increased variable set, employ a Bayesian VAR (BVAR) with Minnesota priors to mitigate the "curse of dimensionality" and ensure parameter stability.
+   - Determine optimal lag length ($p$) using the Hannan-Quinn Information Criterion (HQIC).
+   - Address heteroskedasticity by using robust standard errors (e.g., Newey-West). If residual autocorrelation persists, implement a VAR-GARCH-in-mean specification, with a fallback to standard robust estimation if convergence issues arise.
 
 3. **Structural Identification via Sign Restrictions**
-   - Apply sign restrictions on the impact matrix (1-month horizon) using the Rubio-Ramirez et al. (2010) algorithm:
-     - **Demand Shock:** $\Delta \log(\text{HOUST})$ and $\Delta \log(\text{CSUSHPINSA})$ move in the same direction.
-     - **Supply Shock:** $\Delta \log(\text{HOUST})$ and $\Delta \log(\text{CSUSHPINSA})$ move in opposite directions.
-     - **Financing Cost Shock:** $\Delta \text{Spread}$ increases, while $\Delta \log(\text{HOUST})$ and $\Delta \log(\text{CSUSHPINSA})$ decrease.
-   - Enforce the Financing Cost shock as the only shock permitted to move the spread significantly on impact, potentially using a zero-restriction on the impact of the spread on starts/prices if necessary to prevent unrealistic immediate reactions.
+   - Implement the Rubio-Ramirez et al. (2010) algorithm to identify structural shocks.
+   - Define 'Demand Shocks' as positive co-movement of `CSUSHPINSA` and `HOUST`.
+   - Define 'Supply Shocks' as inverse co-movement of `CSUSHPINSA` and `HOUST`.
+   - Define 'Financing Cost Shocks' as a positive shock to the mortgage-Treasury spread leading to a decline in both `CSUSHPINSA` and `HOUST`. Optionally apply zero-impact restrictions on the contemporaneous response of `HOUST` to the spread to isolate information effects.
 
-4. **Sub-sample Comparative Analysis**
-   - Partition the data into Pre-2008 (1987–2007) and Post-2012 (2012–2024) regimes.
-   - Estimate the SVAR for each period to compare the persistence of supply shocks on price indices.
-   - Conduct formal parameter stability tests (e.g., Chow test or structural break tests) to quantify shifts in supply constraints.
+4. **Regime-Based Comparative Analysis**
+   - Split the sample into Pre-2008 (1987–2007) and Post-2012 (2012–2024) regimes.
+   - Estimate the BVAR separately for these periods to compare the persistence of supply-side constraints.
+   - Perform a Chow-type test on structural parameters to statistically validate shifts in market dynamics.
 
 5. **Counterfactual Simulation (COVID-19 Era)**
-   - Perform two counterfactual simulations for 2020-2022: one holding the *spread* constant at 2019 levels, and one holding the *nominal mortgage rate* constant at 2019 levels.
-   - Set the innovation (shock) to the financing variable to the difference between the actual value and the 2019 baseline, allowing endogenous variables (Starts, Prices, Inventory) to evolve according to the estimated structural coefficients.
+   - Conduct a counterfactual simulation for 2020-2022 by treating the mortgage-Treasury spread as an exogenous input, fixed at 2019 average levels.
+   - Acknowledge the "Lucas Critique" by noting the conditional nature of these results, assuming behavioral parameters remain constant.
+   - Perform a sensitivity check by running the counterfactual using parameters from both the Pre-2008 and Post-2012 regimes to assess if the impact of financing costs on the COVID-era surge is regime-dependent.
 
-6. **Robustness and Sensitivity Testing**
-   - Test sensitivity of the identification by varying the sign restriction horizon (1-month vs. 3-month).
-   - Verify that the inclusion of the inventory variable and the volatility model successfully addresses residual autocorrelation and heteroskedasticity.
-   - Assess if adding a "neutral" restriction on the Inventory variable for the Financing Cost shock improves model identification.
+6. **Robustness and Stability Testing**
+   - Perform sensitivity analysis on sign restriction horizons (1-month vs. 3-month impact constraints).
+   - Generate confidence bands for impulse response functions using bootstrapping (1,000 iterations).
+   - Verify model stability through eigenvalue analysis of the companion matrix.
 
 7. **Variance Decomposition and Interpretation**
-   - Calculate the Forecast Error Variance Decomposition (FEVD) for the housing price index to quantify the relative contribution of financing costs versus demand/supply shocks.
-   - Interpret results within the context of a closed-system model, acknowledging that findings represent internal market dynamics.
+   - Calculate the Forecast Error Variance Decomposition (FEVD) to quantify the relative importance of financing costs versus supply/demand shocks.
+   - Explicitly document the "closed-system" limitations, acknowledging that identified "Supply Shocks" may partially capture unobserved demand-side factors like household formation or migration.
 
 8. **Synthesis of Findings**
-   - Aggregate impulse response functions (IRFs) and historical decompositions to narrate the evolution of housing market drivers.
-   - Document the divergence between demand-led cycles and supply-constrained equilibria, highlighting shifts in supply shock persistence in the post-2012 era.
+   - Aggregate results to construct a narrative on the evolution of housing market drivers.
+   - Clearly distinguish between spread-driven shocks (credit risk/liquidity) and level-driven shocks (interest rate environment) in the post-2012 market equilibrium.
 \end{METHODS}
 

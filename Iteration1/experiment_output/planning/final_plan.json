@@ -1,0 +1,85 @@
+{
+    "sub_tasks": [
+        {
+            "bullet_points": [
+                "Load the three provided CSV files.",
+                "Convert weekly mortgage rates to monthly averages.",
+                "Merge all series into a single monthly dataframe covering the 1987-01 to 2024 period.",
+                "Print a summary of the merged dataframe (shape, date range, descriptive statistics) and verify no missing values.",
+                "Apply log-transformations to Prices and Starts.",
+                "Run Augmented Dickey-Fuller (ADF) unit root tests on all variables before and after differencing; print test statistics and p-values.",
+                "Compute first differences for all variables to ensure stationarity and save the processed dataframe."
+            ],
+            "sub_task": "Data Preparation and Alignment",
+            "sub_task_agent": "engineer"
+        },
+        {
+            "bullet_points": [
+                "Specify the VAR model structure using the processed data.",
+                "Print AIC/BIC values for candidate lag lengths (1-12) and select the optimal lag.",
+                "Estimate the VAR model and perform diagnostic checks (Portmanteau test).",
+                "Implement the CCC-GARCH model on VAR residuals; if convergence fails, use Newey-West standard errors as a fallback.",
+                "Print convergence status and key GARCH parameter estimates.",
+                "Save the estimated model parameters and residuals."
+            ],
+            "sub_task": "Model Specification and Estimation",
+            "sub_task_agent": "engineer"
+        },
+        {
+            "bullet_points": [
+                "Apply sign restrictions (Demand, Supply, Financing Cost shocks) using the Rubio-Ramirez algorithm.",
+                "Ensure at least 1000 accepted rotation matrices are drawn; print the acceptance rate and total count of accepted draws.",
+                "Compute IRFs and save the median responses along with 16th and 84th percentile confidence bands.",
+                "Save structural impact matrices."
+            ],
+            "sub_task": "Structural Identification and Impulse Response Analysis",
+            "sub_task_agent": "engineer"
+        },
+        {
+            "bullet_points": [
+                "Partition the data into Pre-2008 and Post-2012 regimes.",
+                "Re-estimate the model for each sub-sample.",
+                "Conduct formal structural break/stability tests and print the results.",
+                "Save sub-sample model parameters and stability statistics."
+            ],
+            "sub_task": "Sub-sample Analysis and Stability Tests",
+            "sub_task_agent": "engineer"
+        },
+        {
+            "bullet_points": [
+                "Perform counterfactual simulations for the 2020-2022 period (holding financing variables constant at 2019 levels).",
+                "Save the resulting counterfactual paths for Prices, Starts, and Inventory."
+            ],
+            "sub_task": "Counterfactual Simulation",
+            "sub_task_agent": "engineer"
+        },
+        {
+            "bullet_points": [
+                "Generate a consolidated multi-panel figure for IRFs (showing responses with confidence bands).",
+                "Generate a consolidated multi-panel figure for sub-sample comparisons.",
+                "Generate a consolidated multi-panel figure for counterfactual simulation paths.",
+                "Save all figures as high-resolution PNG files."
+            ],
+            "sub_task": "Visualization of Results",
+            "sub_task_agent": "engineer"
+        },
+        {
+            "bullet_points": [
+                "Calculate and print FEVD tables for the housing price index at 1, 3, 6, 12, and 24-month horizons.",
+                "Generate and save a stacked bar chart representing the FEVD across these horizons."
+            ],
+            "sub_task": "Variance Decomposition",
+            "sub_task_agent": "engineer"
+        },
+        {
+            "bullet_points": [
+                "Synthesize findings from IRFs, FEVD, sub-sample stability tests, and counterfactual simulations.",
+                "Interpret structural drivers (demand vs. supply vs. financing) and evolution of market dynamics.",
+                "Write the full Results section, explicitly referencing numerical results (FEVD percentages, IRF peaks, counterfactual deviations) from console outputs and saved statistics.",
+                "Structure the report with subsections for IRF analysis, sub-sample comparison, counterfactual simulation, and variance decomposition."
+            ],
+            "sub_task": "Synthesis and Results Reporting",
+            "sub_task_agent": "researcher"
+        }
+    ]
+}
